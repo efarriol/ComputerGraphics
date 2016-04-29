@@ -1,0 +1,17 @@
+#version 150
+//The fragment shader operates on each pixel in a given polygon
+
+//We declare the input variables that come from the vertex shader
+	//fragment color: It's an interpolation of the color based on the triangles vertices
+in vec4 fragmentColor;
+
+//It will output a color into the screen.
+//Program works with 4 colors, which will be directly send to the screen. 
+//That's why the color that we have to send has 4 components (RGBA)
+out vec4 finalColor;
+
+void main() {
+	//Assign the color based on the color the vertices
+	finalColor = fragmentColor;
+}
+

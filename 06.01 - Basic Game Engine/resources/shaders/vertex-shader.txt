@@ -1,0 +1,24 @@
+#version 150
+
+	//vec3 means a vector of 3 positions that will manage x, y, z
+in vec3 vertexPosition;
+	//vec4 means a vector of 4 positions that will manage RGBA		
+in vec4 vertexColor;
+
+	//Send the color of the vertex to the fragment shader
+out vec4 fragmentColor;
+
+	//Matrix with the changes to execute
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+void main() {
+		//Multiply the vertex by the model matrix transformation
+	gl_Position = projectionMatrix*viewMatrix*modelMatrix*vec4(vertexPosition, 1);
+
+		//We need to create the output variables that will go to the fragment shader,
+		//so, we assign the in variables to the new out variables	
+	fragmentColor=vertexColor;	
+}
+
