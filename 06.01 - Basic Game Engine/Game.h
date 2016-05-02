@@ -36,6 +36,8 @@ class Game {
 		double previousTime;
 		float velocity;
 		int score;
+		float cameraPosIncrement;
+		int cameraType;
 			
 	private:
 			//Attributes	

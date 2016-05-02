@@ -31,7 +31,7 @@ Camera::~Camera(){
 }
 
 glm::mat4 Camera::projectionMatrix() {
-	if (_screenType == PERSP_CAM) {
+	if (_screenType == PERSP_CAM || _screenType == AUTO_CAM) {
 		_projectionMatrix = glm::perspective(_FOV, _aspectRatio, _near, _far);
 	}
 	else if (_screenType == ORTHO_CAM) {
@@ -45,11 +45,7 @@ glm::mat4 Camera::viewMatrix() {
 	glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
 	_cameraUP = glm::cross(cameraDirection, cameraRight);
-	if (_screenType == AUTO_CAM) {
-		_cameraPos.y += 0.1f;
-		_viewMatrix = glm::lookAt(_cameraPos, _cameraFront, _cameraUP);
-	}
-	else _viewMatrix = glm::lookAt(_cameraPos, _cameraFront, _cameraUP);
+	_viewMatrix = glm::lookAt(_cameraPos, _cameraFront, _cameraUP);
 	return _viewMatrix;
 }
 
@@ -57,6 +53,17 @@ glm::vec3 Camera::getPosition(){
 	return _cameraPos;
 }
 
+glm::vec3 Camera::getFront()
+{
+	return _cameraFront;
+}
+
 void Camera::setPosition(glm::vec3 newPosition){
 	_cameraPos = newPosition;
 }
+
+void Camera::setFront(glm::vec3 newFront)
+{
+	_cameraFront = newFront;
+}
+

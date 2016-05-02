@@ -11,7 +11,9 @@ public:
 	glm::mat4 projectionMatrix();
 	glm::mat4 viewMatrix();
 	glm::vec3 getPosition();
+	glm::vec3 getFront();
 	void setPosition(glm::vec3 newPosition);
+	void setFront(glm::vec3 newFront);
 private:
 	float _aspectRatio;
 	glm::mat4 _projectionMatrix;

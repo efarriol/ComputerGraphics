@@ -17,7 +17,9 @@ Game::Game(std::string windowTitle, int screenWidth, int screenHeight, bool enab
 	srand(time(0));
 	velocity = 0.01f;
 	score = 0;
+	cameraPosIncrement = 0.0f;
 	up = false;
+	cameraType = 0;
 }
 
 /**
@@ -160,25 +162,29 @@ void Game::executePlayerCommands() {
 		(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0, -0.05, 0);
 		AABBOne._centre = (_gameElements.getGameElement(0))._translate;
 	}
-	if (_inputManager.isKeyDown(SDLK_UP)) {
-		up = true;
-	}
 
 	/*if (_inputManager.isKeyDown(SDLK_d)) {
 		(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0.01, 0, 0);
 		AABBOne._centre = (_gameElements.getGameElement(0))._translate;
 	}*/
-	if (_inputManager.isKeyDown(SDLK_p)) {
-		_screenType = PERSP_CAM;
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (_inputManager.isKeyPressed(SDLK_p)) {
+		if (cameraType == 0) {
+			_screenType = PERSP_CAM;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			cameraType = 1;
+		}
+		else if (cameraType == 1) {
+			_screenType = ORTHO_CAM;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			cameraType = 2;
+		}
+		else  {
+			_screenType = AUTO_CAM;
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			cameraType = 0;
+		}
 	}
-	if (_inputManager.isKeyDown(SDLK_o)) {
-		_screenType = ORTHO_CAM;
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	if (_inputManager.isKeyDown(SDLK_i)) {
-		_screenType = AUTO_CAM;
-	}
+
 
 }
 
@@ -200,8 +206,10 @@ void Game::doPhysics() {
 		seconds_since_start = difftime(time(0), start);
 		if (seconds_since_start - previousTime >= 1) {
 			velocity += 0.001;
-			previousTime = seconds_since_start;
+			cameraPosIncrement += 0.45f;
 			score++;
+			cout << score << endl;
+			previousTime = seconds_since_start;
 		}
 		for (int i = 1; i <= _gameElements.getGameElement(0)._maxCars; i++) {
 			_gameElements.getGameElement(i)._translate.x += velocity;
@@ -262,6 +270,9 @@ void Game::renderGame() {
 	//Bind the GLSL program. Only one code GLSL can be used at the same time
 	_colorProgram.use();
 	//For each one of the elements: Each object MUST BE RENDERED based on its position, rotation and scale data
+	//_camera.setPosition(glm::vec3(_camera.getPosition().x - cameraPosIncrement, _camera.getPosition().y, _camera.getPosition().z));
+	if (_screenType == AUTO_CAM) _camera.setFront(glm::vec3(_gameElements.getGameElement(0)._translate.x, _gameElements.getGameElement(0)._translate.y, _gameElements.getGameElement(0)._translate.z));
+
 	for (int i = 0; i < _gameElements.getNumGameElements(); i++) {	
 		currentRenderedGameElement = _gameElements.getGameElement(i);	
 		glm::mat4 modelMatrix;
@@ -275,7 +286,7 @@ void Game::renderGame() {
 		//glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 			//Send data to GPU
 		
-		if(up)_camera.setPosition(glm::vec3(_camera.getPosition().x + 0.1f, _camera.getPosition().y, _camera.getPosition().z));
+		
 
 		GLuint modelMatrixUnifrom = _colorProgram.getUniformLocation("modelMatrix");
 		glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));

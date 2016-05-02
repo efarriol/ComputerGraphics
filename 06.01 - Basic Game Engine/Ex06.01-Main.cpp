@@ -2,7 +2,7 @@
 
 
 int main(int argc, char ** argv) {
-	Game game("Release 1.Rendering a list of 3D primitives", WIDTH, HEIGHT,true,60,false);
+	Game game("Taxi Rush", WIDTH, HEIGHT,true,60,false);
 
 	try {
 		game.run();
