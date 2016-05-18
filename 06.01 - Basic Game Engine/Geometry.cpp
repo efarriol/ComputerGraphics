@@ -212,6 +212,10 @@ void Geometry::loadBasic3DObjects()
 			}
 
 			break;
+		case 4:
+			_objectLoader.loadAse("./resources/models/Road.ASE", _numVertices, _verticesData);
+			_texture.getTextureID("./resources/textures/Road_Texture.png");
+			break;
 		}
 	}
 }

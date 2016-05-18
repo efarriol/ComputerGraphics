@@ -20,6 +20,7 @@
 #include "ComputeCollision.h"
 #include <time.h>
 #include <random> 
+#include "TextureManager.h"
 
 
 //Game has four possible states: INIT (Preparing environment), PLAY (Playing), EXIT (Exit from the game) or MENU (Game menu)
@@ -54,6 +55,8 @@ class Game {
 		InputManager _inputManager;		//Manage the input devices
 		AABB AABBOne;
 		GLuint modelMatrixUniform;
+		GLuint viewMatrixUniform;
+		GLuint projectionMatrixUniform;
 			//Internal methods
 		void initSystems();
 		void initShaders();		

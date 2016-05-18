@@ -77,6 +77,8 @@ void Game::initShaders() {
 		//Bind the uniform variables. You must enable shaders before gettting the uniforme variable location
 	_colorProgram.use();
 	modelMatrixUniform = _colorProgram.getUniformLocation("modelMatrix");
+	viewMatrixUniform = _colorProgram.getUniformLocation("viewMatrix");
+	projectionMatrixUniform = _colorProgram.getUniformLocation("projectionMatrix");
 	_colorProgram.unuse();
 }
 
@@ -288,11 +290,8 @@ void Game::renderGame() {
 		
 		
 
-		GLuint modelMatrixUnifrom = _colorProgram.getUniformLocation("modelMatrix");
 		glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-		GLuint viewMatrixUniform = _colorProgram.getUniformLocation("viewMatrix");
 		glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(_camera.viewMatrix()));
-		GLuint projectionMatrixUniform = _colorProgram.getUniformLocation("projectionMatrix");
 		glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(_camera.projectionMatrix()));
 		_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));
 

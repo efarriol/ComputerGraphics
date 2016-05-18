@@ -4,12 +4,14 @@
 #include "GameObject.h"
 #include "CollisionAABB.h"
 #include "ObjectLoader.h"
+#include "TextureManager.h"
 
 #define BLUE_CUBE 0
 #define RED_CUBE 1
 #define WHITE_CUBE 2
-#define ASE_OBJECTS 3
-#define NUMBASICOBJECTS 4
+#define CAR_ASE 3
+#define ROAD_ASE 4
+#define NUMBASICOBJECTS 5
 
 //This class stores and manipulates all the objects loaded from the text fileddd
 class Geometry
@@ -28,6 +30,7 @@ class Geometry
 	float minY;
 	float minZ;
 
+
 public:
 	Geometry();
 	~Geometry();
@@ -40,5 +43,6 @@ public:
 	AABB & getAABB(int objectID);
 	void loadBasic3DObjects();
 	ObjectLoader _objectLoader;
+	TextureManager _texture;
 };
 

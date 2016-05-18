@@ -1,0 +1,22 @@
+texturesPath ../sharedResources/
+numberOfGameObjects 11
+pyramid 0 255 0 255 false textures/specular_texture.jpg 0 0 0 -90 1 0 0 1 1 1
+plane 255 255 255 255 false textures/galaxy2.jpg 0 -500 0 90 1 0 0 1000 1000 1
+plane 255 255 255 255 false textures/galaxy2.jpg 0 500 0 90 1 0 0 1000 1000 1
+plane 255 255 255 255 false textures/galaxy2.jpg 500 0 0 90 0 1 0 1000 1000 1
+plane 255 255 255 255 false textures/galaxy2.jpg -500 0 0 -90 0 1 0 1000 1000 1
+plane 255 255 255 255 false textures/galaxy2.jpg 0 0 -500 0 0 0 0 1000 1000 1
+plane 255 255 255 255 false textures/galaxy2.jpg 0 0 500 0 1 0 0 1000 1000 1
+cube 255 0 0 255 false textures/metal1.jpg 50 50 0 0 0 0 1 5 5 5 
+cube 255 0 0 255 false textures/metal1.jpg 25 -50 0 0 0 0 1 5 5 5 
+cube 255 0 0 255 false textures/metal1.jpg -40 -40 -10 0 0 0 1 2 2 2 
+cube 255 0 0 255 false textures/metal1.jpg 10 5 0 0 0 0 1 5 5 5 
+
+
+//Path of the external resources
+//Number of objects
+//objectType, texture repetition, texture, translate vector, rotation angle, rotation vector, scale vector
+//plane is an unitary square centered at (0,0,0)
+//N-plane is an unitary square centered at (0,0,0). The main difference regarding to plane is that textures are repeated RxC times, where R and C are the X and Y values of the scale vector
+//pyramid is an unitary pyramid centered at (0,0,0)
+//cube is an unitary cube centered at (0,0,0)
