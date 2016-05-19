@@ -689,10 +689,16 @@ int getNumFaces( File & fObject, int m ){
 	return mesh->s_vFace.size();
 }
 
+int getNumVertex(File & fObject, int m) {
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	return mesh->s_vVertex.size();
+}
+
 Point3D getVertex( File & fObject , int m , int f , int v ){
 	Point3D vertex;
 	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
 	Face3D* face = mesh->s_vFace[f];
+
 	switch(v){
 		case 1:
 			vertex.s_fXCoordinate = mesh->s_vVertex[face->s_uiVertexA]->s_fXCoordinate;
@@ -789,3 +795,101 @@ bool LoadFile( char *pFileName , File *fl )
 	}
 	return bLoaded;
 }
+
+
+void addNormal(File & fObject, int m, float x, float y, float z) {
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	Point3D* normal;
+	normal = new Point3D();
+	normal->s_fXCoordinate = x;
+	normal->s_fYCoordinate = y;
+	normal->s_fZCoordinate = z;
+	mesh->s_vNFace.push_back(normal);
+}
+
+
+void addVertexNormal(File & fObject, int m, Point3D *normal)
+{
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	mesh->s_vNVertex.push_back(normal);
+}
+
+void updateVertexNormal(File & fObject, int m, int fv, Point3D *normal, int method)
+{
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	if (method == 0) {
+
+		Face3D* face = mesh->s_vFace[fv];
+
+		mesh->s_vNVertex[face->s_uiVertexA]->s_fXCoordinate += normal->s_fXCoordinate;
+		mesh->s_vNVertex[face->s_uiVertexA]->s_fYCoordinate += normal->s_fYCoordinate;
+		mesh->s_vNVertex[face->s_uiVertexA]->s_fZCoordinate += normal->s_fZCoordinate;
+
+		mesh->s_vNVertex[face->s_uiVertexB]->s_fXCoordinate += normal->s_fXCoordinate;
+		mesh->s_vNVertex[face->s_uiVertexB]->s_fYCoordinate += normal->s_fYCoordinate;
+		mesh->s_vNVertex[face->s_uiVertexB]->s_fZCoordinate += normal->s_fZCoordinate;
+
+		mesh->s_vNVertex[face->s_uiVertexC]->s_fXCoordinate += normal->s_fXCoordinate;
+		mesh->s_vNVertex[face->s_uiVertexC]->s_fYCoordinate += normal->s_fYCoordinate;
+		mesh->s_vNVertex[face->s_uiVertexC]->s_fZCoordinate += normal->s_fZCoordinate;
+	}
+	else {
+		mesh->s_vNVertex[fv]->s_fXCoordinate = normal->s_fXCoordinate;
+		mesh->s_vNVertex[fv]->s_fYCoordinate = normal->s_fYCoordinate;
+		mesh->s_vNVertex[fv]->s_fZCoordinate = normal->s_fZCoordinate;
+	}
+}
+
+Point3D* getVertexNormal(File & fObject, int m, int v) {
+	Point3D* normal = new Point3D();;
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	normal->s_fXCoordinate = mesh->s_vNVertex[v]->s_fXCoordinate;
+	normal->s_fYCoordinate = mesh->s_vNVertex[v]->s_fYCoordinate;
+	normal->s_fZCoordinate = mesh->s_vNVertex[v]->s_fZCoordinate;
+	return normal;
+}
+
+Point3D getNormal(File & fObject, int m, int f) {
+	Point3D normal;
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+
+	normal.s_fXCoordinate = mesh->s_vNFace[f]->s_fXCoordinate;
+	normal.s_fYCoordinate = mesh->s_vNFace[f]->s_fYCoordinate;
+	normal.s_fZCoordinate = mesh->s_vNFace[f]->s_fZCoordinate;
+	return normal;
+}
+
+
+Color getDifuse(File & fObject, int m) {
+	Color color;
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	color.s_fRed = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Diffuse.s_fRed;
+	color.s_fGreen = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Diffuse.s_fGreen;
+	color.s_fBlue = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Diffuse.s_fBlue;
+	return color;
+}
+
+Color getAmbient(File & fObject, int m) {
+	Color color;
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	color.s_fRed = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Ambient.s_fRed;
+	color.s_fGreen = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Ambient.s_fGreen;
+	color.s_fBlue = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Ambient.s_fBlue;
+	return color;
+}
+
+Color getSpecular(File & fObject, int m) {
+	Color color;
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	color.s_fRed = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Specular.s_fRed;
+	color.s_fGreen = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Specular.s_fGreen;
+	color.s_fBlue = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_Specular.s_fBlue;
+	return color;
+}
+
+float getShine(File & fObject, int m) {
+	Mesh* mesh = fObject.s_MeshList.s_vMesh[m];
+	float shine = fObject.s_MatList.s_vMaterial[mesh->s_iMaterialId]->s_fShineComponent*128.0f;
+	return shine;
+}
+

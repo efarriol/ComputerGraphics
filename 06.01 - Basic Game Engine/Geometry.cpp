@@ -82,6 +82,19 @@ void Geometry::loadCube(int i, glm::vec4 color)
 		for (int j = 0; j < 36; j++) _verticesData[i][j].setColor(color.x, color.y, color.z, color.w);
 }
 
+void Geometry::loadPlane(int i, glm::vec4 color){
+	_numVertices.push_back(4);
+	_verticesData.push_back(new Vertex[4]);
+
+	_verticesData[i][0].setPosition(min, max, min);
+	_verticesData[i][1].setPosition(min, min, min);
+	_verticesData[i][2].setPosition(max, min, min);
+	_verticesData[i][3].setPosition(max, max, min);
+
+	for (int j = 0; j < 4; j++) _verticesData[i][j].setColor(color.x, color.y, color.z, color.w);
+
+}
+
 
 Geometry::~Geometry(){
 	for (int i = 0; i < NUMBASICOBJECTS; i++) {
@@ -110,8 +123,16 @@ void Geometry::loadGameElements(char fileName[100]){
 		for (int i = 0; i < _numBasicObjects; i++) {
 			file >> tempObject._objectType >> tempObject._collisionType >> tempAABB._multiplier >> tempObject._translate.x >> tempObject._translate.y >> tempObject._translate.z >> tempObject._angle
 				>> tempObject._rotation.x >> tempObject._rotation.y >> tempObject._rotation.z >> tempObject._scale.x >> tempObject._scale.y >> tempObject._scale.z;
-			_listOfObjects.push_back(tempObject);
+			
+			if (tempObject._objectType == 4) {
+				tempObject._textureFile = "./resources/textures/Road_Texture.png";
+				tempObject._textureRepetion = false;
+				tempObject._texturedObject = true;
+			}
 
+			else tempObject._texturedObject = false;
+
+			_listOfObjects.push_back(tempObject);
 			if (tempObject._collisionType == 1) {
 				// Creation of the AABB
 				tempAABB._centre.x = tempObject._translate.x;
@@ -213,8 +234,7 @@ void Geometry::loadBasic3DObjects()
 
 			break;
 		case 4:
-			_objectLoader.loadAse("./resources/models/Road.ASE", _numVertices, _verticesData);
-			_texture.getTextureID("./resources/textures/Road_Texture.png");
+			loadPlane(ROAD_ASE, glm::vec4(0, 0, 255, 255));
 			break;
 		}
 	}

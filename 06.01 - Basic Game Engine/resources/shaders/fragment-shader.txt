@@ -1,17 +1,29 @@
 #version 150
-//The fragment shader operates on each pixel in a given polygon
+//The fragment shader operates on each fragment in a given polygon
 
-//We declare the input variables that come from the vertex shader
-	//fragment color: It's an interpolation of the color based on the triangles vertices
+//We declare the input variables that come from the vertex shader. 
+//Their values are the result of the interpolation of the vertices from the primitive
 in vec4 fragmentColor;
+in vec2 fragmentTextureCoordinates;
 
-//It will output a color into the screen.
-//Program works with 4 colors, which will be directly send to the screen. 
-//That's why the color that we have to send has 4 components (RGBA)
+//It will output a color (in RGBA) as the result of blending the interpolated color from the primitive and the texture
 out vec4 finalColor;
 
-void main() {
-	//Assign the color based on the color the vertices
-	finalColor = fragmentColor;
+//textureData refers to the GL_TEXTURE(X) used
+uniform sampler2D textureData;
+uniform int drawMode;
+
+void main() {	
+	//The final color can be computed using different approaches
+	switch (drawMode) {
+		case 0:
+			finalColor = fragmentColor;
+			break;
+		case 1:
+			finalColor=texture(textureData,fragmentTextureCoordinates);
+			break;
+		default: 
+			finalColor = fragmentColor*texture(textureData,fragmentTextureCoordinates);
+	}			
 }
 

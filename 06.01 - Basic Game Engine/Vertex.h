@@ -17,10 +17,16 @@ struct ColorRGBA8 {
 	GLubyte b;
 	GLubyte a;
 };
+struct UV {
+	GLfloat u;
+	GLfloat v;
+};
 
 struct Vertex {
 	Position position;
 	ColorRGBA8 color;
+	UV uv;
+
 	void setPosition(GLfloat  x, GLfloat  y, GLfloat  z) {
 		position.x = x;
 		position.y = y;
@@ -33,4 +39,16 @@ struct Vertex {
 		color.b = b;
 		color.a = a;
 	}
+
+	void setUV(GLfloat  u, GLfloat  v) {
+		uv.u = u;
+		uv.v = v;
+	}
+
+	void setNormalVector(GLfloat  x, GLfloat  y, GLfloat  z) {
+	/*	position.x = x;
+		position.y = y;
+		position.z = z;*/
+	}
+
 };

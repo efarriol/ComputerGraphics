@@ -53,12 +53,23 @@ void Game::initSystems() {
 		//Load the current scenario
 	_gameElements.loadBasic3DObjects();
 	_gameElements.loadGameElements("./resources/scene2D.txt");
+	loadGameTextures();
 		//Load the character AABB
 	AABBOne = _gameElements.getAABB(0);
 
 	start = time(0);
 	previousTime = 0;
 }
+
+void Game::loadGameTextures() {
+	GameObject currentGameObject;
+
+	for (int i = 0; i < _gameElements.getNumGameElements(); i++) {
+		currentGameObject = _gameElements.getGameElement(i);
+		if(_gameElements.getGameElement(i)._texturedObject) _gameElements.getGameElement(i)._textureID = _textureManager.getTextureID(currentGameObject._textureFile);
+	}
+}
+
 
 /*
 * Initialize the shaders:
@@ -72,6 +83,7 @@ void Game::initShaders() {
 		//Attributes must be added before linking the code
 	_colorProgram.addAttribute("vertexPositionGame");
 	_colorProgram.addAttribute("vertexColor");
+	_colorProgram.addAttribute("vertexUV");
 		//Link the compiled shaders
 	_colorProgram.linkShaders();
 		//Bind the uniform variables. You must enable shaders before gettting the uniforme variable location
@@ -79,6 +91,10 @@ void Game::initShaders() {
 	modelMatrixUniform = _colorProgram.getUniformLocation("modelMatrix");
 	viewMatrixUniform = _colorProgram.getUniformLocation("viewMatrix");
 	projectionMatrixUniform = _colorProgram.getUniformLocation("projectionMatrix");
+	_drawModeUniform = _colorProgram.getUniformLocation("drawMode");
+	_newColorUniform = _colorProgram.getUniformLocation("objectColor");
+	_textureDataLocation = _colorProgram.getUniformLocation("textureData");
+	_textureScaleFactorLocation = _colorProgram.getUniformLocation("textureScaleFactor");
 	_colorProgram.unuse();
 }
 
@@ -271,10 +287,15 @@ void Game::renderGame() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Bind the GLSL program. Only one code GLSL can be used at the same time
 	_colorProgram.use();
+	glActiveTexture(GL_TEXTURE0);
+
 	//For each one of the elements: Each object MUST BE RENDERED based on its position, rotation and scale data
 	//_camera.setPosition(glm::vec3(_camera.getPosition().x - cameraPosIncrement, _camera.getPosition().y, _camera.getPosition().z));
 	if (_screenType == AUTO_CAM) _camera.setFront(glm::vec3(_gameElements.getGameElement(0)._translate.x, _gameElements.getGameElement(0)._translate.y, _gameElements.getGameElement(0)._translate.z));
-
+		
+	glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(_camera.viewMatrix()));
+	glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(_camera.projectionMatrix()));
+	
 	for (int i = 0; i < _gameElements.getNumGameElements(); i++) {	
 		currentRenderedGameElement = _gameElements.getGameElement(i);	
 		glm::mat4 modelMatrix;
@@ -285,18 +306,32 @@ void Game::renderGame() {
 		}
 		modelMatrix = glm::scale(modelMatrix, currentRenderedGameElement._scale);
 		
-		//glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-			//Send data to GPU
-		
-		
+	
 
+			//Texture
+		if  (currentRenderedGameElement._texturedObject) {
+			glBindTexture(GL_TEXTURE_2D, currentRenderedGameElement._textureID);
+			glUniform1i(_drawModeUniform, 1);	
+		}
+		else {
+			glUniform1i(_drawModeUniform, 0);
+		}
+
+		//glUniform4fv(_newColorUniform, 1, glm::value_ptr(currentRenderedGameElement._color));
+		glUniform1i(_textureDataLocation, 0);		//This line is not needed if we use only 1 texture, it is sending the GL_TEXTURE0		
+		if (currentRenderedGameElement._textureRepetion) {
+			glUniform2f(_textureScaleFactorLocation, currentRenderedGameElement._scale.x, currentRenderedGameElement._scale.y);
+		}
+		else {
+			glUniform2f(_textureScaleFactorLocation, 1.0f, 1.0f);
+		}
+		
 		glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-		glUniformMatrix4fv(viewMatrixUniform, 1, GL_FALSE, glm::value_ptr(_camera.viewMatrix()));
-		glUniformMatrix4fv(projectionMatrixUniform, 1, GL_FALSE, glm::value_ptr(_camera.projectionMatrix()));
-		_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));
-
+				//Send data to GPU
+		_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));	
 	}
 
+	glBindTexture(GL_TEXTURE_2D, 0);
 	//Unbind the program
 	_colorProgram.unuse();
 

@@ -51,14 +51,21 @@ class Game {
 		GLSLProgram _colorProgram;		//Manage the shader programs
 		FPSLimiter _fpsLimiter;			//Manage the synchronization between frame rate and refresh rate
 		OpenGLBuffers _openGLBuffers;	//Manage the openGL buffers
+		TextureManager _textureManager;
 		Geometry _gameElements;			//Manage the game elements
 		InputManager _inputManager;		//Manage the input devices
 		AABB AABBOne;
 		GLuint modelMatrixUniform;
 		GLuint viewMatrixUniform;
 		GLuint projectionMatrixUniform;
+
+		GLuint _drawModeUniform;
+		GLuint _newColorUniform;
+		GLint _textureDataLocation;
+		GLint _textureScaleFactorLocation;
 			//Internal methods
 		void initSystems();
+		void loadGameTextures();
 		void initShaders();		
 		void gameLoop();
 		void processInput();

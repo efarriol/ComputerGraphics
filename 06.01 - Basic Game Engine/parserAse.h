@@ -91,9 +91,24 @@
 		MaterialList	s_MatList;
 		MeshList		s_MeshList;
 	};
+
+		//Methods for getting/setting information about normals
+	void    addNormal(File & fObject, int m, float x, float y, float z);
+	void	addVertexNormal(File & fObject, int m, Point3D *normal);
+	void	updateVertexNormal(File & fObject, int m, int fv, Point3D *normal, int method);
+	Point3D* getVertexNormal(File & fObject, int m, int v);
+	Point3D getNormal(File & fObject, int m, int f);
+	
+		//Methods for getting/setting information about material properties
+	Color	getDifuse(File & fObject, int m);
+	Color	getAmbient(File & fObject, int m);
+	Color	getSpecular(File & fObject, int m);
+	float	getShine(File & fObject, int m);
+
 	Color	getColor( File & fObject , int m );
 	int		getNumMeshes(File & fObject);
 	int		getNumFaces( File & fObject, int m );
+	int     getNumVertex(File & fObject, int m);
 	Point3D getVertex( File & fObject , int m , int f , int v );
 	int		getNumVerticesModel(File & fObject);
 	

@@ -57,6 +57,7 @@ void OpenGLBuffers::allocateVAOVBO() {
 * @param _coloProgram is the object that manages the data related to the shaders
 */
 void OpenGLBuffers::initializeVertexArrayObject(GLSLProgram & _colorProgram) {	
+
 		// Bind the VAO. All subsequent opengl calls will modify it's state.
 	glBindVertexArray(gVAO);
 
@@ -67,6 +68,9 @@ void OpenGLBuffers::initializeVertexArrayObject(GLSLProgram & _colorProgram) {
 	glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexPosition"));
 		//Connect the rgba to the "vertexColor" attribute of the vertex shader
 	glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexColor"));
+
+	//Connect theuv to the "vertexUV" attribute out of the vertex shader
+	glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexUV"));
 
 	//Point Opengl to the data in our VBO
 	/* The vertexPosition attribute refers to the 3D position
@@ -90,9 +94,13 @@ void OpenGLBuffers::initializeVertexArrayObject(GLSLProgram & _colorProgram) {
 	*/
 	glVertexAttribPointer(_colorProgram.getAttribLocation("vertexColor"), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, color));
 
+	//The vertexUV attribute refers to the uv positions of the texture
+	glVertexAttribPointer(_colorProgram.getAttribLocation("vertexUV"), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+
 	// unbind the VAO and VBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
+
 }
 
 
@@ -114,7 +122,8 @@ void OpenGLBuffers::sendDataToGPU(Vertex * data, int numVertices) {
 
 	//Draw a set of elements(numVertices) from the VBO as GL_TRIANGLES. The first vertex is in the 0th position
 
-	glDrawArrays(GL_TRIANGLES, 0, numVertices);
+	if(numVertices == 4 ) glDrawArrays(GL_QUADS, 0, numVertices);
+	else glDrawArrays(GL_TRIANGLES, 0, numVertices);
 
 	//Unbind the VBO and VAO
 	glBindVertexArray(0);	

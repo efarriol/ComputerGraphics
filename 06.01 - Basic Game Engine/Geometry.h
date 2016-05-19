@@ -40,6 +40,7 @@ public:
 	int getNumGameElements();
 	GameObject & getGameElement(int objectID);
 	void loadCube(int cube, glm::vec4 color);
+	void loadPlane(int plane, glm::vec4 color);
 	AABB & getAABB(int objectID);
 	void loadBasic3DObjects();
 	ObjectLoader _objectLoader;
