@@ -16,7 +16,7 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 	//The color of the object
-uniform vec4 objectColor;
+//uniform vec4 objectColor;
 	//how many times the texture will be repeated
 uniform vec2 textureScaleFactor;
 
@@ -26,9 +26,9 @@ void main() {
 
 		//We need to create the output variables that will go to the fragment shader,
 		//so, we assign the in variables to the new out variables	
-	if (objectColor.a>=0)
-		fragmentColor=objectColor;
-	else	
+//	if (objectColor.a>=0)
+//		fragmentColor=objectColor;
+//	else	
 		//We define this else because GLSL obligates to use all the input attributes. Otherwise,we need to remove from its definition
 		fragmentColor=vertexColor;	
 		//OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis

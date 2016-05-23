@@ -19,7 +19,7 @@ void main() {
 		case 0:
 			finalColor = fragmentColor;
 			break;
-		case 1:
+		case 1:			
 			finalColor=texture(textureData,fragmentTextureCoordinates);
 			break;
 		default: 

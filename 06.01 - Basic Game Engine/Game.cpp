@@ -92,7 +92,7 @@ void Game::initShaders() {
 	viewMatrixUniform = _colorProgram.getUniformLocation("viewMatrix");
 	projectionMatrixUniform = _colorProgram.getUniformLocation("projectionMatrix");
 	_drawModeUniform = _colorProgram.getUniformLocation("drawMode");
-	_newColorUniform = _colorProgram.getUniformLocation("objectColor");
+//	_newColorUniform = _colorProgram.getUniformLocation("objectColor");
 	_textureDataLocation = _colorProgram.getUniformLocation("textureData");
 	_textureScaleFactorLocation = _colorProgram.getUniformLocation("textureScaleFactor");
 	_colorProgram.unuse();
