@@ -10,8 +10,11 @@
 #define RED_CUBE 1
 #define WHITE_CUBE 2
 #define CAR_ASE 3
-#define ROAD_ASE 4
-#define NUMBASICOBJECTS 5
+#define ROAD 4
+#define GRASS 5
+#define STREETLIGHT_ASE 6
+#define FENCE_ASE 7
+#define NUMBASICOBJECTS 8
 
 //This class stores and manipulates all the objects loaded from the text fileddd
 class Geometry

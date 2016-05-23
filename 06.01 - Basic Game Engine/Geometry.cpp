@@ -91,8 +91,12 @@ void Geometry::loadPlane(int i, glm::vec4 color){
 	_verticesData[i][2].setPosition(max, min, min);
 	_verticesData[i][3].setPosition(max, max, min);
 
-	for (int j = 0; j < 4; j++) _verticesData[i][j].setColor(color.x, color.y, color.z, color.w);
+	_verticesData[i][0].setUV(0,1);
+	_verticesData[i][1].setUV(0,0);
+	_verticesData[i][2].setUV(1,0);
+	_verticesData[i][3].setUV(1,1);
 
+	for (int j = 0; j < 4; j++) _verticesData[i][j].setColor(color.x, color.y, color.z, color.w);
 }
 
 
@@ -126,10 +130,14 @@ void Geometry::loadGameElements(char fileName[100]){
 			
 			if (tempObject._objectType == 4) {
 				tempObject._textureFile = "./resources/textures/Road_Texture.png";
-				tempObject._textureRepetion = false;
+				tempObject._textureRepetion = true;
 				tempObject._texturedObject = true;
 			}
-
+			else if (tempObject._objectType == 5) {
+				tempObject._textureFile = "./resources/textures/Grass_Texture.jpg";
+				tempObject._textureRepetion = true;
+				tempObject._texturedObject = true;
+			}
 			else tempObject._texturedObject = false;
 
 			_listOfObjects.push_back(tempObject);
@@ -234,8 +242,20 @@ void Geometry::loadBasic3DObjects()
 
 			break;
 		case 4:
-			loadPlane(ROAD_ASE, glm::vec4(0, 0, 255, 255));
+			loadPlane(ROAD, glm::vec4(0, 0, 255, 255));
+			break;
+		case 5:
+			loadPlane(GRASS, glm::vec4(0, 0, 0, 255));
+			break;
+		case 6:
+			_objectLoader.loadAse("./resources/models/streetlight.ASE", _numVertices, _verticesData);
+			for (int j = 0; j < _numVertices[i]; j++) _verticesData[i][j].setColor(125, 125,125, 255);
+			break;
+		case 7:
+			_objectLoader.loadAse("./resources/models/fence.ASE", _numVertices, _verticesData);
+			for (int j = 0; j < _numVertices[i]; j++) _verticesData[i][j].setColor(87, 50, 23, 255);
 			break;
 		}
+
 	}
 }

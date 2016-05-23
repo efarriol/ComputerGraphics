@@ -165,7 +165,7 @@ void Game::executePlayerCommands() {
 		glm::ivec2 mouseCoords = _inputManager.getMouseCoords();
 		cout << mouseCoords.x << ", " << mouseCoords.y << endl;
 	}
-
+	cout << _gameElements.getGameElement(0)._translate.y << endl;
 	if (_inputManager.isKeyDown(SDLK_w)) {
 		(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0, 0.05, 0);
 		AABBOne._centre = (_gameElements.getGameElement(0))._translate;
