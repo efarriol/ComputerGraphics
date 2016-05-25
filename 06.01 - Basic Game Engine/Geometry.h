@@ -5,6 +5,7 @@
 #include "CollisionAABB.h"
 #include "ObjectLoader.h"
 #include "TextureManager.h"
+#include "MaterialManager.h"
 
 #define BLUE_CUBE 0
 #define RED_CUBE 1
@@ -46,7 +47,9 @@ public:
 	void loadPlane(int plane, glm::vec4 color);
 	AABB & getAABB(int objectID);
 	void loadBasic3DObjects();
+	glm::vec3 computeFaceNormal(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3);
 	ObjectLoader _objectLoader;
 	TextureManager _texture;
+	MaterialManager _material;
 };
 

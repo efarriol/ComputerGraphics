@@ -181,6 +181,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GLSLProgram.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="ObjectLoader.cpp" />
     <ClCompile Include="OpenGLBuffers.cpp" />
     <ClCompile Include="parserAse.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GLSLProgram.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="ObjectLoader.h" />
     <ClInclude Include="OpenGLBuffers.h" />
     <ClInclude Include="parserAse.h" />

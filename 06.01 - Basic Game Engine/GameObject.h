@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>			//OpenGL Mathematics 
-
-
+#include <string>
+#include "MaterialManager.h"
 struct GameObject
 {
 	int _maxCars;
@@ -16,4 +16,6 @@ struct GameObject
 	glm::vec3 _scale;
 	std::string _textureFile;
 	int _collisionType;
+	std::string _materialType;
+	material _materialAttributes;
 };

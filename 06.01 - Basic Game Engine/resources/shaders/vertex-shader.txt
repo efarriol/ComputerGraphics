@@ -1,40 +1,47 @@
 #version 150
 
-	//vec3 means a vector of 3 positions that will manage x, y, z
+//The vertex shader receives the 3D position and the UV texture coordinates of the current vector
+//This version do not use the color attribute of the vertices because the color is defined at object level
 in vec3 vertexPosition;
-	//vec4 means a vector of 4 positions that will manage RGBA		
-in vec4 vertexColor;
-	//vec2 means a vector of 2 positions that will manage the UV
+//in vec4 vertexColor;
 in vec2 vertexUV;
+in vec3 vertexNormal;
 
-	//Send the color and the texture positions from the vertex to the fragment shader
+//Vertex shader sends the object's color and the texture positions to the next stage. Rasterizer will automatically interpolate the value for the different fragments
 out vec4 fragmentColor;
 out vec2 fragmentTextureCoordinates;
+out vec3 fragmentNormal;
+out vec3 fragmentPosition;
 
 	//MVP matrices
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 	//The color of the object
-//uniform vec4 objectColor;
+uniform vec4 objectColor;
 	//how many times the texture will be repeated
 uniform vec2 textureScaleFactor;
+	//normal model matrix
+uniform mat3 modelNormalMatrix;
 
 
 void main() {
+		//Move the vertex from the local coordinates to the projection coordinates thanks to the transformation matrices
 	gl_Position = projectionMatrix*viewMatrix*modelMatrix*vec4(vertexPosition, 1);
 
-		//We need to create the output variables that will go to the fragment shader,
-		//so, we assign the in variables to the new out variables	
-//	if (objectColor.a>=0)
-//		fragmentColor=objectColor;
-//	else	
-		//We define this else because GLSL obligates to use all the input attributes. Otherwise,we need to remove from its definition
-		fragmentColor=vertexColor;	
-		//OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis
-		//Moreover, we multiple by a factor that manage if the texture has to be repeated or not
+		//Compute the color that has to be send to the next stage. In this case, the color remains equally
+	fragmentColor=objectColor;	
+	
+		//Compute the texture data that has to be send to next stage
+			//OpenGL expects the 0.0 coordinate on the y-axis to be on the bottom side of the image, but images usually have 0.0 at the top of the y-axis
+			//Moreover, we multiple by a factor that manage if the texture has to be repeated or not
 	fragmentTextureCoordinates=vec2(vertexUV.x,1.0-vertexUV.y)*textureScaleFactor;
 
+		//Adjust the normals
+	fragmentNormal = modelNormalMatrix * vertexNormal;  
+
+		//We need the fragment position in the worlds coordinates, this is why the current position only uses the model transformation matrix
+	fragmentPosition=vec3(modelMatrix * vec4(vertexPosition, 1.0f));
 }
 
 

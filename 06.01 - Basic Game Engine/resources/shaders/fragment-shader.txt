@@ -1,29 +1,74 @@
 #version 150
-//The fragment shader operates on each fragment in a given polygon
 
-//We declare the input variables that come from the vertex shader. 
-//Their values are the result of the interpolation of the vertices from the primitive
+struct Material {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+}; 
+
+
+//The fragment shader operates on each fragment in a given polygon and it has to output the final color
+//The final color is a combination of the object color, the texture and the Phong reflectance model based on the draw mode
+//The fragment shader receives the interpolated RGBA color, the UV texture coordinates, the normal and the current position sent from the vertex shader 
+
 in vec4 fragmentColor;
 in vec2 fragmentTextureCoordinates;
+in vec3 fragmentNormal;
+in vec3 fragmentPosition;
 
-//It will output a color (in RGBA) as the result of blending the interpolated color from the primitive and the texture
-out vec4 finalColor;
-
-//textureData refers to the GL_TEXTURE(X) used
 uniform sampler2D textureData;
 uniform int drawMode;
+uniform int lightingEnabled;
+uniform int isALightSource;
+uniform vec3 lightPosition;
+uniform vec3 viewerPosition;
+uniform Material material;
+uniform Material lightColor;
+
+out vec4 finalColor;
 
 void main() {	
-	//The final color can be computed using different approaches
-	switch (drawMode) {
-		case 0:
-			finalColor = fragmentColor;
-			break;
-		case 1:			
-			finalColor=texture(textureData,fragmentTextureCoordinates);
-			break;
-		default: 
-			finalColor = fragmentColor*texture(textureData,fragmentTextureCoordinates);
-	}			
+
+	vec4 tempColor;
+	if (isALightSource==0) {
+		//The final color can be computed using different approaches
+		switch (drawMode) {
+			case 0:
+				finalColor = fragmentColor;
+				break;
+			case 1:
+				finalColor=texture(textureData,fragmentTextureCoordinates);
+				break;
+			default: 
+				finalColor = fragmentColor*texture(textureData,fragmentTextureCoordinates);
+		}			
+		
+		if (lightingEnabled==1) {			
+				//Ambient component
+			vec3 ambient=material.ambient*lightColor.ambient;
+		
+				//Diffuse component
+			vec3 norm = normalize(fragmentNormal);
+			vec3 lightDir = normalize(lightPosition - fragmentPosition);  
+
+			float diff = max(dot(norm, lightDir), 0.0);
+			vec3 diffuse = lightColor.diffuse* diff * material.diffuse;
+
+				//Specular component
+			vec3 viewDir = normalize(viewerPosition - fragmentPosition);
+			vec3 reflectDir = reflect(-lightDir, norm);  
+			float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+			vec3 specular = lightColor.specular * spec * material.specular;  
+
+			finalColor=vec4((ambient+diffuse+specular),1)*finalColor;
+		}
+	}else {
+		if (lightingEnabled==1) {
+			finalColor=vec4(lightColor.specular,1.0f);
+		}else {
+			finalColor = vec4(0.0f,0.0f,0.0f,0.0f);
+		}
+	}
 }
 

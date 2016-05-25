@@ -79,7 +79,12 @@ void Geometry::loadCube(int i, glm::vec4 color)
 		_verticesData[i][34].setPosition(max, min, max);
 		_verticesData[i][35].setPosition(max, min, min);
 
-		for (int j = 0; j < 36; j++) _verticesData[i][j].setColor(color.x, color.y, color.z, color.w);
+	
+
+		for (int j = 0; j < 36; j++) {
+			_verticesData[i][j].setColor(color.x, color.y, color.z, color.w);
+			_verticesData[i][j].setNormalVector (_verticesData[i][j].getPosition().x, _verticesData[i][j].getPosition().y, _verticesData[i][j].getPosition().z);
+		}
 }
 
 void Geometry::loadPlane(int i, glm::vec4 color){
@@ -95,9 +100,15 @@ void Geometry::loadPlane(int i, glm::vec4 color){
 	_verticesData[i][1].setUV(0,0);
 	_verticesData[i][2].setUV(1,0);
 	_verticesData[i][3].setUV(1,1);
+	//Because all normals in a plane are equal we compute them with the same value
+	for (int j = 0; j < 4; j++) {
+		glm::vec3 normal(computeFaceNormal(_verticesData[i][0].getPosition(), _verticesData[i][1].getPosition(), _verticesData[i][2].getPosition()));
+		_verticesData[i][j].setNormalVector(normal.x, normal.y, normal.z);
+	}
 
 	for (int j = 0; j < 4; j++) _verticesData[i][j].setColor(color.x, color.y, color.z, color.w);
 }
+
 
 
 Geometry::~Geometry(){
@@ -125,7 +136,7 @@ void Geometry::loadGameElements(char fileName[100]){
 		file >> tempObject._maxCars;
 	
 		for (int i = 0; i < _numBasicObjects; i++) {
-			file >> tempObject._objectType >> tempObject._collisionType >> tempAABB._multiplier >> tempObject._translate.x >> tempObject._translate.y >> tempObject._translate.z >> tempObject._angle
+			file >> tempObject._objectType >> tempObject._collisionType >> tempAABB._multiplier >> tempObject._materialType >> tempObject._translate.x >> tempObject._translate.y >> tempObject._translate.z >> tempObject._angle
 				>> tempObject._rotation.x >> tempObject._rotation.y >> tempObject._rotation.z >> tempObject._scale.x >> tempObject._scale.y >> tempObject._scale.z;
 			
 			if (tempObject._objectType == 4) {
@@ -139,6 +150,18 @@ void Geometry::loadGameElements(char fileName[100]){
 				tempObject._texturedObject = true;
 			}
 			else tempObject._texturedObject = false;
+
+			if (tempObject._materialType == "GOLD") {
+				tempObject._materialAttributes = _material.getMaterialComponents(GOLD);
+			}
+			else if (tempObject._materialType == "CHROME") {
+				tempObject._materialAttributes = _material.getMaterialComponents(CHROME);
+			}
+			else {
+				tempObject._materialAttributes = _material.getMaterialComponents(LIGHT);
+
+			}
+		
 
 			_listOfObjects.push_back(tempObject);
 			if (tempObject._collisionType == 1) {
@@ -230,7 +253,10 @@ void Geometry::loadBasic3DObjects()
 			break;
 		case 3:
 			_objectLoader.loadAse("./resources/models/taxi.ASE", _numVertices, _verticesData);
-			for (int j = 0; j < _numVertices[i]; j++) _verticesData[i][j].setColor(255, 255, 0, 255);
+			for (int j = 0; j < _numVertices[i]; j++) {
+				if (j != 43 || j != 44 || j != 45 || j != 46) _verticesData[i][j].setColor(255, 255, 0, 255);
+				else _verticesData[i][j].setColor(100, 100, 100, 255);
+			}
 			for (int j = 0; j < _numVertices[i]; j++) {
 				if (_verticesData[i][j].position.x > maxX) maxX = _verticesData[i][j].position.x;
 				if (_verticesData[i][j].position.y > maxY) maxY = _verticesData[i][j].position.y;
@@ -258,4 +284,8 @@ void Geometry::loadBasic3DObjects()
 		}
 
 	}
+}
+
+glm::vec3 Geometry::computeFaceNormal(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3) {
+	return glm::cross(v1 - v2, v3 - v2);
 }

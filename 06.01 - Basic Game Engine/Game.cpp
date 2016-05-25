@@ -82,8 +82,9 @@ void Game::initShaders() {
 	_colorProgram.compileShaders();
 		//Attributes must be added before linking the code
 	_colorProgram.addAttribute("vertexPositionGame");
-	_colorProgram.addAttribute("vertexColor");
+	//_colorProgram.addAttribute("vertexColor");
 	_colorProgram.addAttribute("vertexUV");
+	_colorProgram.addAttribute("vertexNormal");
 		//Link the compiled shaders
 	_colorProgram.linkShaders();
 		//Bind the uniform variables. You must enable shaders before gettting the uniforme variable location
@@ -223,7 +224,7 @@ void Game::doPhysics() {
 		(_gameElements.getGameElement(4))._rotation.y = 1.0f;*/
 		seconds_since_start = difftime(time(0), start);
 		if (seconds_since_start - previousTime >= 1) {
-			velocity += 0.001;
+			velocity += 0.001f;
 			cameraPosIncrement += 0.45f;
 			score++;
 			cout << score << endl;

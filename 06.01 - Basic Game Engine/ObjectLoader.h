@@ -13,4 +13,3 @@ public:
 	void loadAse(char * fileName, std::vector <int> & numVertices, std::vector <Vertex *> & verticesData);
 	void computeNormals(File *Object);
 };
-

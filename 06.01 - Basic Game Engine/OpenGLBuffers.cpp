@@ -67,10 +67,13 @@ void OpenGLBuffers::initializeVertexArrayObject(GLSLProgram & _colorProgram) {
 		//Connect the xyz to the "vertexPosition" attribute of the vertex shader
 	glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexPosition"));
 		//Connect the rgba to the "vertexColor" attribute of the vertex shader
-	glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexColor"));
+	//glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexColor"));
 
 	//Connect theuv to the "vertexUV" attribute out of the vertex shader
 	glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexUV"));
+	//Connect theuv to the "vertexNormal" attribute out of the vertex shader
+	glEnableVertexAttribArray(_colorProgram.getAttribLocation("vertexNormal"));
+
 
 	//Point Opengl to the data in our VBO
 	/* The vertexPosition attribute refers to the 3D position
@@ -92,16 +95,19 @@ void OpenGLBuffers::initializeVertexArrayObject(GLSLProgram & _colorProgram) {
 	The fifth argument, sizeof(Vertex), says that the information in the buffer vertex object will be composed by elements of the type Vertex
 	The sixth argument, (void*)offsetof(Vertex, color), says where starts this kind of information in the vertex buffer object
 	*/
-	glVertexAttribPointer(_colorProgram.getAttribLocation("vertexColor"), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+	//glVertexAttribPointer(_colorProgram.getAttribLocation("vertexColor"), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, color));
 
 	//The vertexUV attribute refers to the uv positions of the texture
 	glVertexAttribPointer(_colorProgram.getAttribLocation("vertexUV"), 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
+
+	glVertexAttribPointer(_colorProgram.getAttribLocation("vertexNormal"), 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
 	// unbind the VAO and VBO
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 
 }
+
 
 
 
