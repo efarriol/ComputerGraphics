@@ -89,10 +89,12 @@ void Game::initShaders() {
 	_colorProgram.linkShaders();
 		//Bind the uniform variables. You must enable shaders before gettting the uniforme variable location
 	_colorProgram.use();
+	//_lightTypeUniform = _colorProgram.getUniformLocation("light.type");
 	modelMatrixUniform = _colorProgram.getUniformLocation("modelMatrix");
 	viewMatrixUniform = _colorProgram.getUniformLocation("viewMatrix");
 	projectionMatrixUniform = _colorProgram.getUniformLocation("projectionMatrix");
 	_drawModeUniform = _colorProgram.getUniformLocation("drawMode");
+	_viewerPositionUniform = _colorProgram.getUniformLocation("viewerPosition");
 //	_newColorUniform = _colorProgram.getUniformLocation("objectColor");
 	_textureDataLocation = _colorProgram.getUniformLocation("textureData");
 	_textureScaleFactorLocation = _colorProgram.getUniformLocation("textureScaleFactor");
@@ -103,11 +105,14 @@ void Game::initShaders() {
 	_materialDiffuseUniform = _colorProgram.getUniformLocation("material.diffuse");
 	_materialSpecularUniform = _colorProgram.getUniformLocation("material.specular");
 	_materialShininessUniform = _colorProgram.getUniformLocation("material.shininess");
-	_lightAmbientUniform = _colorProgram.getUniformLocation("lightColor.ambient");
-	_lightDiffuseUniform = _colorProgram.getUniformLocation("lightColor.diffuse");
-	_lightSpecularUniform = _colorProgram.getUniformLocation("lightColor.specular");
-	_lightShininessUniform = _colorProgram.getUniformLocation("lightColor.shininess");
-	_materialTypeUniform = _colorProgram.getUniformLocation("lightColor.type");
+	_lightAmbientUniform = _colorProgram.getUniformLocation("light.ambient");
+	_lightDiffuseUniform = _colorProgram.getUniformLocation("light.diffuse");
+	_lightSpecularUniform = _colorProgram.getUniformLocation("light.specular");
+	_linearUniform = _colorProgram.getUniformLocation("light.linear");
+	_constantUniform = _colorProgram.getUniformLocation("light.constant");
+	_quadraticUniform = _colorProgram.getUniformLocation("light.quadratic");
+	//_lightShininessUniform = _colorProgram.getUniformLocation("light.shininess");
+
 
 	_lightPositionUniform = _colorProgram.getUniformLocation("lightPosition");
 	_colorProgram.unuse();
@@ -332,15 +337,20 @@ void Game::renderGame() {
 		//Material
 		if (currentRenderedGameElement._materialType == "LIGHT") {
 			glUniform1i(_isALightSourceUniform, 1);
-			if (currentRenderedGameElement._lightEnable) glUniform1d(_lightingEnabledUniform, 1);
-			else glUniform1d(_lightingEnabledUniform, 0);
+			if (currentRenderedGameElement._lightEnable) glUniform1i(_lightingEnabledUniform, 1);
+			else glUniform1i(_lightingEnabledUniform, 0);
 			currentMaterial.type = 0;
 			glUniform3fv(_lightPositionUniform, 1, glm::value_ptr(currentRenderedGameElement._translate));
-			glUniform1i(_materialTypeUniform, currentMaterial.type);
+			currentMaterial.ambient = glm::vec3 (5.0f);
 			glUniform3fv(_lightAmbientUniform, 1, glm::value_ptr(currentMaterial.ambient));
 			glUniform3fv(_lightDiffuseUniform, 1, glm::value_ptr(currentMaterial.diffuse));
 			glUniform3fv(_lightSpecularUniform, 1, glm::value_ptr(currentMaterial.specular));
-			glUniform1f(_lightShininessUniform, currentMaterial.shininess);
+			glUniform1f(_linearUniform, 1.0f);
+			glUniform1f(_constantUniform, 0.0014f);
+			glUniform1f(_quadraticUniform, 0.000007f);
+		//	glUniform1i(_lightTypeUniform, currentMaterial.type);
+
+			//glUniform1f(_lightShininessUniform, currentMaterial.shininess);
 		}
 		else glUniform1i(_isALightSourceUniform, 0);
 		
@@ -349,7 +359,7 @@ void Game::renderGame() {
 		glUniform3fv(_materialDiffuseUniform, 1, glm::value_ptr(currentMaterial.diffuse));
 		glUniform3fv(_materialSpecularUniform, 1, glm::value_ptr(currentMaterial.specular));
 		glUniform1f(_materialShininessUniform, currentMaterial.shininess);
-
+		glUniform3fv(_viewerPositionUniform, 1, glm::value_ptr(_camera.getPosition()));
 
 		//glUniform4fv(_newColorUniform, 1, glm::value_ptr(currentRenderedGameElement._color));
 		glUniform1i(_textureDataLocation, 0);		//This line is not needed if we use only 1 texture, it is sending the GL_TEXTURE0		

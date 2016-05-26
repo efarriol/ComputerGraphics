@@ -63,17 +63,20 @@ class Game {
 		GLuint projectionMatrixUniform;
 		GLuint modelNormalMatrixUniform;
 
+		GLuint _linearUniform;
+		GLuint _constantUniform;
+		GLuint _quadraticUniform;
+		GLuint _viewerPositionUniform;
 		GLuint _lightPositionUniform;
 		GLuint _materialAmbientUniform;
 		GLuint _materialDiffuseUniform;
 		GLuint _materialSpecularUniform;
-		GLuint _materialTypeUniform;
 		GLuint _materialShininessUniform;
 		GLuint _lightAmbientUniform;
 		GLuint _lightDiffuseUniform;
 		GLuint _lightSpecularUniform;
 		GLuint _lightTypeUniform;
-		GLuint _lightShininessUniform;
+		//GLuint _lightShininessUniform;
 		GLuint _isALightSourceUniform;
 		GLuint _lightingEnabledUniform;
 		GLuint _drawModeUniform;

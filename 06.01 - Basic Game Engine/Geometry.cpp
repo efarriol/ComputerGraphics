@@ -149,6 +149,26 @@ void Geometry::loadGameElements(char fileName[100]){
 				tempObject._textureRepetion = true;
 				tempObject._texturedObject = true;
 			}
+			else if (tempObject._objectType == 3) {
+				tempObject._textureFile = "./resources/textures/Yellow_Texture.png";
+				tempObject._textureRepetion = true;
+				tempObject._texturedObject = true;
+			}
+			else if (tempObject._objectType == 7) {
+				tempObject._textureFile = "./resources/textures/Brown_Texture.png";
+				tempObject._textureRepetion = true;
+				tempObject._texturedObject = true;
+			}
+			else if (tempObject._objectType == 6) {
+				tempObject._textureFile = "./resources/textures/Grey_Texture.png";
+				tempObject._textureRepetion = true;
+				tempObject._texturedObject = true;
+			}
+			else if (tempObject._objectType == 1) {
+				tempObject._textureFile = "./resources/textures/Purple_Texture.png";
+				tempObject._textureRepetion = true;
+				tempObject._texturedObject = true;
+			}
 			else tempObject._texturedObject = false;
 			if (tempObject._materialType == "LIGHT") {
 				tempObject._lightEnable = true;
