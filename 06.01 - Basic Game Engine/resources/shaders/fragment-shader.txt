@@ -4,7 +4,9 @@ struct Material {
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+	vec3 direction;
 	float shininess;
+	int type;
 }; 
 
 
@@ -60,6 +62,13 @@ void main() {
 			vec3 reflectDir = reflect(-lightDir, norm);  
 			float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 			vec3 specular = lightColor.specular * spec * material.specular;  
+
+			if(lightColor.type ==0) {
+				lightDir = normalize(-lightColor.direction);
+			} else if (lightColor.type==1){
+				lightDir = normalize(lightPosition - fragmentPosition);
+			}
+
 
 			finalColor=vec4((ambient+diffuse+specular),1)*finalColor;
 		}

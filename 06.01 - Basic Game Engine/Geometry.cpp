@@ -150,18 +150,9 @@ void Geometry::loadGameElements(char fileName[100]){
 				tempObject._texturedObject = true;
 			}
 			else tempObject._texturedObject = false;
-
-			if (tempObject._materialType == "GOLD") {
-				tempObject._materialAttributes = _material.getMaterialComponents(GOLD);
+			if (tempObject._materialType == "LIGHT") {
+				tempObject._lightEnable = true;
 			}
-			else if (tempObject._materialType == "CHROME") {
-				tempObject._materialAttributes = _material.getMaterialComponents(CHROME);
-			}
-			else {
-				tempObject._materialAttributes = _material.getMaterialComponents(LIGHT);
-
-			}
-		
 
 			_listOfObjects.push_back(tempObject);
 			if (tempObject._collisionType == 1) {

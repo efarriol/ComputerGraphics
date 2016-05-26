@@ -96,7 +96,22 @@ void Game::initShaders() {
 //	_newColorUniform = _colorProgram.getUniformLocation("objectColor");
 	_textureDataLocation = _colorProgram.getUniformLocation("textureData");
 	_textureScaleFactorLocation = _colorProgram.getUniformLocation("textureScaleFactor");
+	modelNormalMatrixUniform = _colorProgram.getUniformLocation("modelNormalMatrix");
+	_isALightSourceUniform = _colorProgram.getUniformLocation("isALightSource");
+	_lightingEnabledUniform = _colorProgram.getUniformLocation("lightingEnabled");
+	_materialAmbientUniform = _colorProgram.getUniformLocation("material.ambient");
+	_materialDiffuseUniform = _colorProgram.getUniformLocation("material.diffuse");
+	_materialSpecularUniform = _colorProgram.getUniformLocation("material.specular");
+	_materialShininessUniform = _colorProgram.getUniformLocation("material.shininess");
+	_lightAmbientUniform = _colorProgram.getUniformLocation("lightColor.ambient");
+	_lightDiffuseUniform = _colorProgram.getUniformLocation("lightColor.diffuse");
+	_lightSpecularUniform = _colorProgram.getUniformLocation("lightColor.specular");
+	_lightShininessUniform = _colorProgram.getUniformLocation("lightColor.shininess");
+	_materialTypeUniform = _colorProgram.getUniformLocation("lightColor.type");
+
+	_lightPositionUniform = _colorProgram.getUniformLocation("lightPosition");
 	_colorProgram.unuse();
+	
 }
 
 /*
@@ -217,11 +232,6 @@ void Game::doPhysics() {
 	ComputeCollision computeCollision;
 	
 	if (counter == 1) {
-		/*(_gameElements.getGameElement(1))._angle = (_gameElements.getGameElement(1))._angle + 5;
-		(_gameElements.getGameElement(1))._rotation.z = 1.0f;
-		(_gameElements.getGameElement(4))._angle = (_gameElements.getGameElement(4))._angle + 1;
-		(_gameElements.getGameElement(4))._rotation.x = 1.0f;
-		(_gameElements.getGameElement(4))._rotation.y = 1.0f;*/
 		seconds_since_start = difftime(time(0), start);
 		if (seconds_since_start - previousTime >= 1) {
 			velocity += 0.001f;
@@ -230,9 +240,12 @@ void Game::doPhysics() {
 			cout << score << endl;
 			previousTime = seconds_since_start;
 		}
-		for (int i = 1; i <= _gameElements.getGameElement(0)._maxCars; i++) {
-			_gameElements.getGameElement(i)._translate.x += velocity;
-			_gameElements.getAABB(i)._centre.x += velocity;
+
+		for (int i = 0; i < _gameElements.getNumGameElements(); i++) {
+			if (_gameElements.getGameElement(i)._objectType == 3) {
+				_gameElements.getGameElement(i)._translate.x += velocity;
+				_gameElements.getAABB(i)._centre.x += velocity;
+			}
 		}
 		counter = 0;
 	}
@@ -264,12 +277,12 @@ void Game::doPhysics() {
 		if (_gameElements.getGameElement(i)._translate.x >= 4) {
 			std::random_device rd;
 			std::mt19937 eng(rd());
-			std::uniform_real_distribution<> dis(-0.7, 0.7);
+			std::uniform_real_distribution<> dis(-0.7f, 0.7f);
 			int collisionID = 0;
 			for (int a = 1; a <= i; a++) {
 				if (_gameElements.getGameElement(a)._collisionType == 1 || _gameElements.getGameElement(a)._collisionType == 2) collisionID++;
 			}
-			_gameElements.getGameElement(i)._translate.x = -4;
+			_gameElements.getGameElement(i)._translate.x = -4.0f;
 			_gameElements.getAABB(collisionID)._centre.x = _gameElements.getGameElement(i)._translate.x;
 			_gameElements.getGameElement(i)._translate.y = dis(eng);
 			_gameElements.getAABB(collisionID)._centre.y = _gameElements.getGameElement(i)._translate.y;
@@ -300,23 +313,43 @@ void Game::renderGame() {
 	for (int i = 0; i < _gameElements.getNumGameElements(); i++) {	
 		currentRenderedGameElement = _gameElements.getGameElement(i);	
 		glm::mat4 modelMatrix;
-	
+		glm::mat3 modelNormalMatrix;
 		modelMatrix = glm::translate(modelMatrix, currentRenderedGameElement._translate);
 		if (currentRenderedGameElement._angle != 0) {
 			modelMatrix = glm::rotate(modelMatrix, glm::radians(currentRenderedGameElement._angle), currentRenderedGameElement._rotation);
 		}
 		modelMatrix = glm::scale(modelMatrix, currentRenderedGameElement._scale);
 		
-	
+		modelNormalMatrix = glm::mat3(glm::transpose(glm::inverse(modelMatrix)));
 
 			//Texture
 		if  (currentRenderedGameElement._texturedObject) {
 			glBindTexture(GL_TEXTURE_2D, currentRenderedGameElement._textureID);
 			glUniform1i(_drawModeUniform, 1);	
 		}
-		else {
-			glUniform1i(_drawModeUniform, 0);
+		else glUniform1i(_drawModeUniform, 0);
+		
+		//Material
+		if (currentRenderedGameElement._materialType == "LIGHT") {
+			glUniform1i(_isALightSourceUniform, 1);
+			if (currentRenderedGameElement._lightEnable) glUniform1d(_lightingEnabledUniform, 1);
+			else glUniform1d(_lightingEnabledUniform, 0);
+			currentMaterial.type = 0;
+			glUniform3fv(_lightPositionUniform, 1, glm::value_ptr(currentRenderedGameElement._translate));
+			glUniform1i(_materialTypeUniform, currentMaterial.type);
+			glUniform3fv(_lightAmbientUniform, 1, glm::value_ptr(currentMaterial.ambient));
+			glUniform3fv(_lightDiffuseUniform, 1, glm::value_ptr(currentMaterial.diffuse));
+			glUniform3fv(_lightSpecularUniform, 1, glm::value_ptr(currentMaterial.specular));
+			glUniform1f(_lightShininessUniform, currentMaterial.shininess);
 		}
+		else glUniform1i(_isALightSourceUniform, 0);
+		
+		currentMaterial = _materialManager.getMaterialComponents(_materialManager.getMaterialID(currentRenderedGameElement._materialType));
+		glUniform3fv(_materialAmbientUniform, 1, glm::value_ptr(currentMaterial.ambient));
+		glUniform3fv(_materialDiffuseUniform, 1, glm::value_ptr(currentMaterial.diffuse));
+		glUniform3fv(_materialSpecularUniform, 1, glm::value_ptr(currentMaterial.specular));
+		glUniform1f(_materialShininessUniform, currentMaterial.shininess);
+
 
 		//glUniform4fv(_newColorUniform, 1, glm::value_ptr(currentRenderedGameElement._color));
 		glUniform1i(_textureDataLocation, 0);		//This line is not needed if we use only 1 texture, it is sending the GL_TEXTURE0		
@@ -328,6 +361,7 @@ void Game::renderGame() {
 		}
 		
 		glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+		glUniformMatrix4fv(modelNormalMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelNormalMatrix));
 				//Send data to GPU
 		_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));	
 	}

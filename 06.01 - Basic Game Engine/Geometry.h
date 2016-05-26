@@ -15,7 +15,7 @@
 #define GRASS 5
 #define STREETLIGHT_ASE 6
 #define FENCE_ASE 7
-#define NUMBASICOBJECTS 8
+#define NUMBASICOBJECTS 9
 
 //This class stores and manipulates all the objects loaded from the text fileddd
 class Geometry

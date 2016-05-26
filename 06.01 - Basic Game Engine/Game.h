@@ -42,6 +42,7 @@ class Game {
 			
 	private:
 			//Attributes	
+
 		std::string _windowTitle;		//Window Title
 		int _screenWidth;				//Screen width in pixels				
 		int _screenHeight;				//Screen height in pixels	
@@ -55,10 +56,26 @@ class Game {
 		Geometry _gameElements;			//Manage the game elements
 		InputManager _inputManager;		//Manage the input devices
 		AABB AABBOne;
+		material currentMaterial;
+		MaterialManager _materialManager;
 		GLuint modelMatrixUniform;
 		GLuint viewMatrixUniform;
 		GLuint projectionMatrixUniform;
+		GLuint modelNormalMatrixUniform;
 
+		GLuint _lightPositionUniform;
+		GLuint _materialAmbientUniform;
+		GLuint _materialDiffuseUniform;
+		GLuint _materialSpecularUniform;
+		GLuint _materialTypeUniform;
+		GLuint _materialShininessUniform;
+		GLuint _lightAmbientUniform;
+		GLuint _lightDiffuseUniform;
+		GLuint _lightSpecularUniform;
+		GLuint _lightTypeUniform;
+		GLuint _lightShininessUniform;
+		GLuint _isALightSourceUniform;
+		GLuint _lightingEnabledUniform;
 		GLuint _drawModeUniform;
 		GLuint _newColorUniform;
 		GLint _textureDataLocation;

@@ -17,5 +17,5 @@ struct GameObject
 	std::string _textureFile;
 	int _collisionType;
 	std::string _materialType;
-	material _materialAttributes;
+	bool _lightEnable;
 };

@@ -36,6 +36,9 @@ int MaterialManager::getMaterialID(std::string materialName) {
 	else if (materialName == "Chrome" ||materialName == "CHROME" || materialName == "chrome") {
 		return CHROME;
 	}
+	else if (materialName == "Light" || materialName == "LIGHT" || materialName == "light") {
+		return LIGHT;
+	}
 	else {
 		ErrorManagement::errorRunTime("Name " + materialName + " is not an existent material");
 	}
