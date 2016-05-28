@@ -6,6 +6,7 @@
 #include "ObjectLoader.h"
 #include "TextureManager.h"
 #include "MaterialManager.h"
+#include <random> 
 
 #define BLUE_CUBE 0
 #define RED_CUBE 1
@@ -15,7 +16,11 @@
 #define GRASS 5
 #define STREETLIGHT_ASE 6
 #define FENCE_ASE 7
-#define NUMBASICOBJECTS 9
+#define MENU_TITLE 8
+#define HOUSE 9
+#define ROOF 10
+#define LOSE_TITLE 11
+#define NUMBASICOBJECTS 12
 
 //This class stores and manipulates all the objects loaded from the text fileddd
 class Geometry
@@ -51,5 +56,6 @@ public:
 	ObjectLoader _objectLoader;
 	TextureManager _texture;
 	MaterialManager _material;
+	bool firstRender;
 };
 

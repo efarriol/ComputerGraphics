@@ -52,6 +52,8 @@ void Game::initSystems() {
 	_openGLBuffers.initializeBuffers(_colorProgram);
 		//Load the current scenario
 	_gameElements.loadBasic3DObjects();
+	_gameElements.firstRender = true;
+
 	_gameElements.loadGameElements("./resources/scene2D.txt");
 	loadGameTextures();
 		//Load the character AABB
@@ -59,6 +61,7 @@ void Game::initSystems() {
 
 	start = time(0);
 	previousTime = 0;
+	_gameState = GameState::MENU;
 }
 
 void Game::loadGameTextures() {
@@ -123,17 +126,17 @@ void Game::initShaders() {
 * Game execution: Gets input events, processes game logic and draws sprites on the screen
 */
 void Game::gameLoop() {	
-	_gameState = GameState::PLAY;
 	while (_gameState != GameState::EXIT) {	
 			//Start synchronization between refresh rate and frame rate
 		_fpsLimiter.startSynchronization();
 			//Process the input information (keyboard and mouse)
 		processInput();
-			//Execute the player actions (keyboard and mouse)
-		executePlayerCommands();
+			//Execute the GAMEer actions (keyboard and mouse)
+		executeGAMECommands();
 			//Update the game status
-		doPhysics();
+		if(_gameState == GameState::GAME)doPhysics();
 			//Draw the objects on the screen
+		//if (_gameState == GameState::MENU && !menuRendered) renderMenu();
 		renderGame();	
 			//Force synchronization
 		_fpsLimiter.forceSynchronization();
@@ -180,51 +183,60 @@ void Game::processInput() {
 /**
 * Executes the actions sent by the user by means of the keyboard and mouse
 */
-void Game::executePlayerCommands() {
+void Game::executeGAMECommands() {
 	Camera camera(WIDTH, HEIGHT, _screenType);
-	if (_inputManager.isKeyPressed(SDL_BUTTON_LEFT)){
-		glm::ivec2 mouseCoords = _inputManager.getMouseCoords();
-		cout << mouseCoords.x << ", " << mouseCoords.y << endl;
-	}
-	cout << _gameElements.getGameElement(0)._translate.y << endl;
-	if (_inputManager.isKeyDown(SDLK_w)) {
-		(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0, 0.05, 0);
-		AABBOne._centre = (_gameElements.getGameElement(0))._translate;
-		
-	}
+	if (_gameState == GameState::GAME) {
+		if (_inputManager.isKeyDown(SDLK_w) || _inputManager.isKeyDown(SDLK_UP)) {
+			(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0, 0.05, 0);
+			AABBOne._centre = (_gameElements.getGameElement(0))._translate;
 
-	/*if (_inputManager.isKeyDown(SDLK_a)) {
-		(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(-0.01, 0, 0);
-		AABBOne._centre = (_gameElements.getGameElement(0))._translate;
-	}*/
-	if (_inputManager.isKeyDown(SDLK_s)) {
-		(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0, -0.05, 0);
-		AABBOne._centre = (_gameElements.getGameElement(0))._translate;
-	}
-
-	/*if (_inputManager.isKeyDown(SDLK_d)) {
-		(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0.01, 0, 0);
-		AABBOne._centre = (_gameElements.getGameElement(0))._translate;
-	}*/
-	if (_inputManager.isKeyPressed(SDLK_p)) {
-		if (cameraType == 0) {
-			_screenType = PERSP_CAM;
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			cameraType = 1;
 		}
-		else if (cameraType == 1) {
-			_screenType = ORTHO_CAM;
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			cameraType = 2;
+		if (_inputManager.isKeyDown(SDLK_s) || _inputManager.isKeyDown(SDLK_DOWN)) {
+			(_gameElements.getGameElement(0))._translate = (_gameElements.getGameElement(0))._translate - glm::vec3(0, -0.05, 0);
+			AABBOne._centre = (_gameElements.getGameElement(0))._translate;
 		}
-		else  {
-			_screenType = AUTO_CAM;
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			cameraType = 0;
+		if (_inputManager.isKeyPressed(SDLK_p)) {
+			if (cameraType == 0) {
+				_screenType = PERSP_CAM;
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				cameraType = 1;
+			}
+			else if (cameraType == 1) {
+				_screenType = ORTHO_CAM;
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				cameraType = 2;
+			}
+			else {
+				_screenType = AUTO_CAM;
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				cameraType = 0;
+			}
 		}
 	}
-
-
+	else if(_gameState == GameState::MENU) {
+		if (_inputManager.isKeyPressed(SDLK_1)) {
+			_gameState = GameState::GAME;
+		}
+		if (_inputManager.isKeyPressed(SDLK_2)) {
+			_gameState = GameState::EXIT;
+		}
+	}
+	else if (_gameState == GameState::LOSE){
+		if (_inputManager.isKeyPressed(SDLK_r)) {
+			_gameElements.firstRender = false;
+			_gameElements.loadGameElements("./resources/scene2D.txt");
+			loadGameTextures();
+			AABBOne = _gameElements.getAABB(0);
+			start = time(0);
+			previousTime = 0;
+			velocity = 0.01f;
+			score = 0;
+			_gameState = GameState::GAME;
+		}
+		if (_inputManager.isKeyPressed(SDLK_e)) {
+			_gameState = GameState::EXIT;
+		}
+	}
 }
 
 /*
@@ -242,7 +254,6 @@ void Game::doPhysics() {
 			velocity += 0.001f;
 			cameraPosIncrement += 0.45f;
 			score++;
-			cout << score << endl;
 			previousTime = seconds_since_start;
 		}
 
@@ -266,15 +277,9 @@ void Game::doPhysics() {
 			if (glm::length(AABBTwo._centre - AABBOne._centre) < distance) {
 
 				if (computeCollision.computeCollisionAABB(AABBOne, AABBTwo)) { 
-					cout << j << endl;
-					cout << endl << "************************" << endl;
-					cout << "GAME OVER" << endl;
-					cout << "FINAL SCORE: " << score << endl;
-					cout << "************************" << endl;
-					system("Pause");
-					_gameState = GameState::EXIT;
+					cout << endl << "YOU LOSE"<< endl << "SCORE:" << score << endl;
+					_gameState = GameState::LOSE;
 					 }
-
 			}
 		}
 	}
@@ -292,6 +297,12 @@ void Game::doPhysics() {
 			_gameElements.getGameElement(i)._translate.y = dis(eng);
 			_gameElements.getAABB(collisionID)._centre.y = _gameElements.getGameElement(i)._translate.y;
 		}
+	}
+	if (_gameElements.getGameElement(0)._translate.y >= 1.05f) {
+		_gameElements.getGameElement(0)._translate.y = 1.049f;
+	}
+	if (_gameElements.getGameElement(0)._translate.y <= -0.8f) {
+		_gameElements.getGameElement(0)._translate.y = -0.79f;
 	}
 }
 
@@ -373,13 +384,18 @@ void Game::renderGame() {
 		glUniformMatrix4fv(modelMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 		glUniformMatrix4fv(modelNormalMatrixUniform, 1, GL_FALSE, glm::value_ptr(modelNormalMatrix));
 				//Send data to GPU
-		_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));	
+		if(_gameState==GameState::MENU && currentRenderedGameElement._renderType == "MENU")
+			_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));	
+		else if (_gameState == GameState::GAME && currentRenderedGameElement._renderType == "GAME")
+			_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));
+		else if (_gameState == GameState::LOSE && (currentRenderedGameElement._renderType == "GAME" || currentRenderedGameElement._renderType == "LOSE"))
+			_openGLBuffers.sendDataToGPU(_gameElements.getData(currentRenderedGameElement._objectType), _gameElements.getNumVertices(currentRenderedGameElement._objectType));
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//Unbind the program
 	_colorProgram.unuse();
 
-	//Swap the display buffers (displays what was just drawn)
+	//Swap the disGAME buffers (disGAMEs what was just drawn)
 	_window.swapBuffer();
-} 
+}

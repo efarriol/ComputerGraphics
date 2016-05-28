@@ -6,6 +6,7 @@ struct GameObject
 {
 	int _maxCars;
 	int _objectType;
+	std::string _renderType;
 	glm::vec4 _color;
 	glm::vec3 _translate;
 	GLuint _textureID;

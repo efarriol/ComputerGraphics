@@ -136,7 +136,7 @@ void Geometry::loadGameElements(char fileName[100]){
 		file >> tempObject._maxCars;
 	
 		for (int i = 0; i < _numBasicObjects; i++) {
-			file >> tempObject._objectType >> tempObject._collisionType >> tempAABB._multiplier >> tempObject._materialType >> tempObject._translate.x >> tempObject._translate.y >> tempObject._translate.z >> tempObject._angle
+			file >> tempObject._objectType >> tempObject._collisionType >> tempAABB._multiplier >> tempObject._renderType >>tempObject._materialType >> tempObject._translate.x >> tempObject._translate.y >> tempObject._translate.z >> tempObject._angle
 				>> tempObject._rotation.x >> tempObject._rotation.y >> tempObject._rotation.z >> tempObject._scale.x >> tempObject._scale.y >> tempObject._scale.z;
 			
 			if (tempObject._objectType == 4) {
@@ -149,7 +149,7 @@ void Geometry::loadGameElements(char fileName[100]){
 				tempObject._textureRepetion = true;
 				tempObject._texturedObject = true;
 			}
-			else if (tempObject._objectType == 3) {
+			else if (tempObject._objectType == 3 || tempObject._objectType == 8 || tempObject._objectType == 11) {
 				tempObject._textureFile = "./resources/textures/Yellow_Texture.png";
 				tempObject._textureRepetion = true;
 				tempObject._texturedObject = true;
@@ -169,12 +169,31 @@ void Geometry::loadGameElements(char fileName[100]){
 				tempObject._textureRepetion = true;
 				tempObject._texturedObject = true;
 			}
+			else if (tempObject._objectType == 9) {
+				tempObject._textureFile = "./resources/textures/House_Texture.png";
+				tempObject._textureRepetion = false;
+				tempObject._texturedObject = true;
+			}
+			else if (tempObject._objectType == 10) {
+				tempObject._textureFile = "./resources/textures/Roof_Texture.png";
+				tempObject._textureRepetion = true;
+				tempObject._texturedObject = true;
+			}
 			else tempObject._texturedObject = false;
 			if (tempObject._materialType == "LIGHT") {
 				tempObject._lightEnable = true;
 			}
 
-			_listOfObjects.push_back(tempObject);
+			if (tempObject._objectType == 3) {
+				std::random_device rd;
+				std::mt19937 eng(rd());
+				std::uniform_real_distribution<> dis(-0.7f, 0.7f);
+				int collisionID = 0;
+				tempObject._translate.y = dis(eng);
+			}
+			if(firstRender)_listOfObjects.push_back(tempObject);
+			else _listOfObjects[i] = tempObject;
+
 			if (tempObject._collisionType == 1) {
 				// Creation of the AABB
 				tempAABB._centre.x = tempObject._translate.x;
@@ -184,8 +203,9 @@ void Geometry::loadGameElements(char fileName[100]){
 				tempAABB._extent.y = tempObject._scale.y*tempAABB._multiplier;
 				tempAABB._extent.z = tempObject._scale.z*tempAABB._multiplier;
 				
-				_listOfAABB.push_back(tempAABB);
-			
+				if (firstRender)_listOfAABB.push_back(tempAABB);
+				else _listOfAABB[i] = tempAABB;
+
 			}
 			if (tempObject._collisionType == 2) {
 				tempAABB._centre.x = tempObject._translate.x;
@@ -195,7 +215,8 @@ void Geometry::loadGameElements(char fileName[100]){
 				tempAABB._extent.y = ((minY - maxY) + 0.3f) / 2;
 				tempAABB._extent.z = (minZ - maxZ) / 2;
 
-				_listOfAABB.push_back(tempAABB);
+				if (firstRender)_listOfAABB.push_back(tempAABB);
+				else _listOfAABB[i] = tempAABB;
 			}
 		
 		}
@@ -276,7 +297,6 @@ void Geometry::loadBasic3DObjects()
 				if (_verticesData[i][j].position.y < minY) minY = _verticesData[i][j].position.y;
 				if (_verticesData[i][j].position.z < minZ) minZ = _verticesData[i][j].position.z;
 			}
-
 			break;
 		case 4:
 			loadPlane(ROAD, glm::vec4(0, 0, 255, 255));
@@ -286,14 +306,25 @@ void Geometry::loadBasic3DObjects()
 			break;
 		case 6:
 			_objectLoader.loadAse("./resources/models/streetlight.ASE", _numVertices, _verticesData);
-			for (int j = 0; j < _numVertices[i]; j++) _verticesData[i][j].setColor(125, 125,125, 255);
+			for (int j = 0; j < _numVertices[i]; j++) _verticesData[i][j].setColor(125, 125, 125, 255);
 			break;
 		case 7:
 			_objectLoader.loadAse("./resources/models/fence.ASE", _numVertices, _verticesData);
 			for (int j = 0; j < _numVertices[i]; j++) _verticesData[i][j].setColor(87, 50, 23, 255);
 			break;
+		case 8:
+			_objectLoader.loadAse("./resources/models/MenuTitle.ASE", _numVertices, _verticesData);
+			break;
+		case 9:
+			loadPlane(HOUSE, glm::vec4(255, 0, 0, 255));
+			break;
+		case 10:
+			loadPlane(ROOF, glm::vec4(255, 0, 0, 255));
+			break;
+		case 11:
+			_objectLoader.loadAse("./resources/models/LoseTitle.ASE", _numVertices, _verticesData);
+			break;
 		}
-
 	}
 }
 

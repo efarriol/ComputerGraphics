@@ -22,9 +22,8 @@
 #include <random> 
 #include "TextureManager.h"
 
-
-//Game has four possible states: INIT (Preparing environment), PLAY (Playing), EXIT (Exit from the game) or MENU (Game menu)
-enum class GameState{INIT, PLAY, EXIT, MENU};
+//Game has four possible states: INIT (Preparing environment), GAME (GAMEing), EXIT (Exit from the game) or MENU (Game menu)
+enum class GameState{INIT, GAME, EXIT, MENU, LOSE};
 
 //This class manages the game execution
 class Game {
@@ -54,7 +53,7 @@ class Game {
 		OpenGLBuffers _openGLBuffers;	//Manage the openGL buffers
 		TextureManager _textureManager;
 		Geometry _gameElements;			//Manage the game elements
-		InputManager _inputManager;		//Manage the input devices
+		InputManager _inputManager;	
 		AABB AABBOne;
 		material currentMaterial;
 		MaterialManager _materialManager;
@@ -90,9 +89,8 @@ class Game {
 		void gameLoop();
 		void processInput();
 		void doPhysics();
-		void executePlayerCommands();
+		void executeGAMECommands();
 		void renderGame();	
 		bool up;
-		
 };
 
